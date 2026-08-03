@@ -43,13 +43,14 @@ def process_workqueue(workqueue: Workqueue):
                 if borger is None:
                     continue  # Skip, borger findes ikke i Momentum
 
+                # Check om borger allerede har en markering for manglende NemKonto
                 borgers_markeringer = momentum.borgere.hent_markeringer(borger)
                 nemkonto_markering = next(
                     (m for m in borgers_markeringer if m["tag"]["title"] == "Borger har ikke NemKonto" and m["tag"]["end"] is None), None
                 )
                 if nemkonto_markering:
                     continue # Skip, borger har allerede markering for manglende NemKonto
-                # markering findes ikke endnu. Vi venter på forretningen
+
                 momentum.borgere.opret_markering( 
                     markeringsnavn="Borger har ikke NemKonto",
                     borger=borger,
