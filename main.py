@@ -92,7 +92,6 @@ if __name__ == "__main__":
             username=f"{roboa.username}@odense.dk",
             password=roboa.password,
             idp=roboa.data["idp"],
-            headless=True
         )
         workqueue.clear_workqueue(WorkItemStatus.NEW)
         populate_queue(workqueue)
