@@ -21,6 +21,14 @@ def populate_queue(workqueue: Workqueue):
     opgaver = ky.opgaveindbakke.hent_opgaver("KH - 22. Liste nemkonto")
 
     for opgave in opgaver:
+        borger = ky.borgere.hent_borgersag(cpr=opgave["CPR-nummer"])
+        ky.borgere.luk_borgersag(borger["pId"])
+        ubehandlede_opgaver = borger.get("Ubehandlede opgaver", [])
+        afslut_bevillings_opgave = next(
+            (o for o in ubehandlede_opgaver if o["Opgave"] == "Afslut bevilling"), None
+        )
+        if afslut_bevillings_opgave:
+            continue
         data = {
             "cpr": opgave["CPR-nummer"],
             "navn": opgave["Navn"],
@@ -46,7 +54,7 @@ def process_workqueue(workqueue: Workqueue):
                 # Check om borger allerede har en markering for manglende NemKonto
                 borgers_markeringer = momentum.borgere.hent_markeringer(borger)
                 nemkonto_markering = next(
-                    (m for m in borgers_markeringer if m["tag"]["title"] == "Borger har ikke NemKonto" and m["tag"]["end"] is None), None
+                    (m for m in borgers_markeringer if m["tag"]["title"] == "Borger har ikke NemKonto" and m["end"] is None), None
                 )
                 if nemkonto_markering:
                     continue # Skip, borger har allerede markering for manglende NemKonto
